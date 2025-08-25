@@ -1,10 +1,10 @@
 <?php
 
-namespace VendorName\Skeleton\Tests;
+namespace Rodrigolopespt\SibsMbwayAP\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
-use VendorName\Skeleton\SkeletonServiceProvider;
+use Rodrigolopespt\SibsMbwayAP\SibsMbwayAPServiceProvider;
 
 class TestCase extends Orchestra
 {
@@ -13,25 +13,47 @@ class TestCase extends Orchestra
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'VendorName\\Skeleton\\Database\\Factories\\'.class_basename($modelName).'Factory'
+            fn (string $modelName) => 'Rodrigolopespt\\SibsMbwayAP\\Database\\Factories\\'.class_basename($modelName).'Factory'
         );
     }
 
     protected function getPackageProviders($app)
     {
         return [
-            SkeletonServiceProvider::class,
+            SibsMbwayAPServiceProvider::class,
         ];
     }
 
     public function getEnvironmentSetUp($app)
     {
         config()->set('database.default', 'testing');
+        config()->set('database.connections.testing', [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => '',
+        ]);
 
-        /*
-         foreach (\Illuminate\Support\Facades\File::allFiles(__DIR__ . '/database/migrations') as $migration) {
-            (include $migration->getRealPath())->up();
-         }
-         */
+        $this->loadMigrations($app);
+    }
+
+    /**
+     * Load package migrations for testing
+     */
+    protected function loadMigrations($app): void
+    {
+        $migrationFiles = [
+            'create_sibs_authorized_payments_table.php.stub',
+            'create_sibs_charges_table.php.stub',
+            'create_sibs_transactions_table.php.stub',
+        ];
+
+        foreach ($migrationFiles as $file) {
+            $migrationPath = __DIR__.'/../database/migrations/'.$file;
+
+            if (file_exists($migrationPath)) {
+                $migration = include $migrationPath;
+                $migration->up();
+            }
+        }
     }
 }

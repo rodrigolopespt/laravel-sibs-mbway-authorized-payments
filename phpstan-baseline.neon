@@ -1,0 +1,43 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 16
+			path: config/sibs-mbway-authorized-payments.php
+
+		-
+			message: '#^Parameter \#2 \$transactionSignature of method Rodrigolopespt\\SibsMbwayAP\\Api\\Client\:\:get\(\) expects string\|null, array\<string, string\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Api/Endpoints/AuthorizedPaymentEndpoint.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:isActive\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Models/Charge.php
+
+		-
+			message: '#^Property Rodrigolopespt\\SibsMbwayAP\\Services\\AuthorizedPaymentService\:\:\$client is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Services/AuthorizedPaymentService.php
+
+		-
+			message: '#^Parameter \#1 \$authorization of method Rodrigolopespt\\SibsMbwayAP\\Services\\ChargeService\:\:processCharge\(\) expects Rodrigolopespt\\SibsMbwayAP\\Models\\AuthorizedPayment, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Services/ChargeService.php
+
+		-
+			message: '#^Property Rodrigolopespt\\SibsMbwayAP\\Services\\ChargeService\:\:\$client is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Services/ChargeService.php
+
+		-
+			message: '#^Parameter \#2 \$authorization of class Rodrigolopespt\\SibsMbwayAP\\Events\\ChargeProcessed constructor expects Rodrigolopespt\\SibsMbwayAP\\Models\\AuthorizedPayment, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Services/WebhookService.php

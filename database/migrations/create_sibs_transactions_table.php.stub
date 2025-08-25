@@ -1,0 +1,49 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up()
+    {
+        Schema::create('sibs_transactions', function (Blueprint $table) {
+            $table->id();
+            
+            // Generic transaction data for all SIBS operations
+            $table->string('transaction_id')->unique(); // SIBS transaction ID
+            $table->string('merchant_transaction_id')->nullable(); // Our internal ID
+            $table->enum('type', ['authorization_request', 'charge', 'refund', 'cancellation']);
+            
+            // Reference to specific operation
+            $table->morphs('transactionable'); // Can be AuthorizedPayment, Charge, etc.
+            
+            // Transaction details
+            $table->decimal('amount', 10, 2);
+            $table->string('currency', 3)->default('EUR');
+            $table->enum('status', ['pending', 'success', 'failed', 'cancelled']);
+            
+            // SIBS specific data
+            $table->json('request_data')->nullable(); // Original request sent to SIBS
+            $table->json('response_data')->nullable(); // Response from SIBS
+            $table->string('return_code')->nullable(); // SIBS return code
+            $table->text('return_message')->nullable(); // SIBS return message
+            
+            // Timestamps
+            $table->timestamp('requested_at'); // When request was made
+            $table->timestamp('completed_at')->nullable(); // When response was received
+            $table->timestamps();
+            
+            // Indexes
+            $table->index(['type', 'status']);
+            $table->index('merchant_transaction_id');
+            $table->index(['transactionable_type', 'transactionable_id']);
+        });
+    }
+
+    public function down()
+    {
+        Schema::dropIfExists('sibs_transactions');
+    }
+};

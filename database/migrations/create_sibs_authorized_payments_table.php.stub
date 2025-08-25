@@ -1,0 +1,46 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up()
+    {
+        Schema::create('sibs_authorized_payments', function (Blueprint $table) {
+            $table->id();
+            
+            // SIBS Authorization data
+            $table->string('authorization_id')->unique()->nullable(); // ID from SIBS (set when approved)
+            $table->string('customer_phone'); // Format: 351919999999
+            $table->string('customer_email');
+            
+            // Authorization limits
+            $table->decimal('max_amount', 10, 2); // Maximum authorized amount
+            $table->string('currency', 3)->default('EUR');
+            $table->timestamp('validity_date'); // When authorization expires
+            
+            // Status tracking
+            $table->enum('status', ['pending', 'active', 'expired', 'cancelled'])->default('pending');
+            $table->text('description'); // Description shown to customer
+            $table->string('merchant_reference')->nullable(); // Internal reference
+            
+            // Additional data
+            $table->json('metadata')->nullable(); // Additional data as needed
+            
+            // Timestamps
+            $table->timestamps();
+            
+            // Indexes for performance
+            $table->index(['customer_phone', 'status']);
+            $table->index(['status', 'validity_date']);
+            $table->index('merchant_reference');
+        });
+    }
+
+    public function down()
+    {
+        Schema::dropIfExists('sibs_authorized_payments');
+    }
+};
